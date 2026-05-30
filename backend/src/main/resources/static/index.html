@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Resume Analyzer</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ═════════════════════════════════════════════════════ -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-text">ResumeAI</span>
+    </div>
+    <div class="nav-links">
+      <a href="#upload" class="nav-link">Analyze</a>
+      <a href="#results-section" class="nav-link">Results</a>
+      <a href="#history-section" class="nav-link">History</a>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ════════════════════════════════════════════════════════ -->
+  <section class="hero" id="upload">
+    <div class="hero-bg">
+      <div class="grid-lines"></div>
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        AI-Powered Resume Analysis
+      </div>
+      <h1 class="hero-title">
+        Analyze Your<br/>
+        <span class="title-accent">Resume</span> Instantly
+      </h1>
+      <p class="hero-subtitle">
+        Upload your PDF or DOCX resume and get detailed insights — skills extraction, ATS score, experience level, and personalized improvement tips.
+      </p>
+
+      <!-- Upload Area -->
+      <div class="upload-card" id="uploadCard">
+        <div class="upload-zone" id="dropZone">
+          <div class="upload-icon">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32 42V22M32 22L24 30M32 22L40 30" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M20 48H44M12 36C12 30 16 26 22 26C22 18 28 14 34 16C40 12 48 16 48 24C54 24 56 30 54 36" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p class="upload-title">Drop your resume here</p>
+          <p class="upload-sub">PDF or DOCX — up to 10MB</p>
+          <label for="fileInput" class="upload-btn">
+            <span>Browse Files</span>
+          </label>
+          <input type="file" id="fileInput" accept=".pdf,.docx" hidden />
+        </div>
+
+        <!-- File preview -->
+        <div class="file-preview" id="filePreview" style="display:none">
+          <div class="file-icon">📄</div>
+          <div class="file-info">
+            <p class="file-name" id="fileName"></p>
+            <p class="file-size" id="fileSize"></p>
+          </div>
+          <button class="remove-file" id="removeFile">✕</button>
+        </div>
+
+        <!-- Analyze Button -->
+        <button class="analyze-btn" id="analyzeBtn" disabled>
+          <span id="btnText">Analyze Resume</span>
+          <span id="btnLoader" class="btn-loader" style="display:none">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ RESULTS ══════════════════════════════════════════════════════ -->
+  <section class="results-section" id="results-section" style="display:none">
+    <div class="container">
+
+      <!-- Header -->
+      <div class="section-header">
+        <h2>Analysis <span class="accent">Results</span></h2>
+        <p id="resultCandidateName" class="candidate-label"></p>
+      </div>
+
+      <!-- Top Cards Row -->
+      <div class="stats-row">
+        <div class="stat-card ats-card">
+          <p class="stat-label">ATS Score</p>
+          <div class="ats-gauge">
+            <svg viewBox="0 0 120 70" class="gauge-svg">
+              <path d="M10,60 A50,50 0 0,1 110,60" stroke="#1e293b" stroke-width="10" fill="none"/>
+              <path d="M10,60 A50,50 0 0,1 110,60" stroke="url(#atsGrad)" stroke-width="10" fill="none"
+                    stroke-dasharray="157" stroke-dashoffset="157" id="gaugePath" stroke-linecap="round"/>
+              <defs>
+                <linearGradient id="atsGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#f43f5e"/>
+                  <stop offset="50%" stop-color="#f59e0b"/>
+                  <stop offset="100%" stop-color="#22c55e"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <p class="ats-number" id="atsNumber">0</p>
+            <p class="ats-out">/ 100</p>
+          </div>
+          <p class="ats-label" id="atsLabel">Calculating...</p>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Experience Level</p>
+          <p class="stat-big" id="expLevel">—</p>
+          <p class="stat-note" id="expYears"></p>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Skills Found</p>
+          <p class="stat-big" id="skillCount">—</p>
+          <p class="stat-note">technical + soft skills</p>
+        </div>
+
+        <div class="stat-card">
+          <p class="stat-label">Word Count</p>
+          <p class="stat-big" id="wordCount">—</p>
+          <p class="stat-note">resume content</p>
+        </div>
+      </div>
+
+      <!-- Main Results Grid -->
+      <div class="results-grid">
+
+        <!-- Contact Info -->
+        <div class="result-card">
+          <h3 class="card-title"><span class="card-icon">👤</span> Contact Info</h3>
+          <div class="info-list" id="contactInfo"></div>
+        </div>
+
+        <!-- Skills -->
+        <div class="result-card wide">
+          <h3 class="card-title"><span class="card-icon">🛠️</span> Skills Detected</h3>
+          <div class="skills-container" id="skillsContainer"></div>
+        </div>
+
+        <!-- Education -->
+        <div class="result-card">
+          <h3 class="card-title"><span class="card-icon">🎓</span> Education</h3>
+          <div id="educationList"></div>
+        </div>
+
+        <!-- Experience -->
+        <div class="result-card">
+          <h3 class="card-title"><span class="card-icon">💼</span> Work Experience</h3>
+          <div id="experienceList"></div>
+        </div>
+
+        <!-- Suggestions -->
+        <div class="result-card wide suggestions-card">
+          <h3 class="card-title"><span class="card-icon">💡</span> Improvement Suggestions</h3>
+          <ul class="suggestions-list" id="suggestionsList"></ul>
+        </div>
+
+      </div>
+
+      <!-- New Analysis Button -->
+      <div class="new-analysis-wrap">
+        <button class="new-analysis-btn" id="newAnalysisBtn">
+          + Analyze Another Resume
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ HISTORY ══════════════════════════════════════════════════════ -->
+  <section class="history-section" id="history-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Resume <span class="accent">History</span></h2>
+        <button class="refresh-btn" id="refreshHistory">↺ Refresh</button>
+      </div>
+      <div class="history-grid" id="historyGrid">
+        <div class="empty-state">
+          <p class="empty-icon">📂</p>
+          <p>No resumes analyzed yet.</p>
+          <p class="empty-sub">Upload a resume above to get started!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <p>Smart Resume Analyzer &nbsp;·&nbsp; Built with Java Spring Boot + MongoDB</p>
+  </footer>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

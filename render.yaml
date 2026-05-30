@@ -1,0 +1,33 @@
+# ════════════════════════════════════════════════════════
+# render.yaml — Render Deployment Configuration
+# Deploy Smart Resume Analyzer on Render.com
+# ════════════════════════════════════════════════════════
+
+services:
+  # ─── Backend Spring Boot App ──────────────────────────
+  - type: web
+    name: smart-resume-analyzer
+    runtime: java
+    region: oregon              # Choose your region
+
+    # Build command — Maven builds the fat JAR
+    buildCommand: cd backend && mvn clean package -DskipTests
+
+    # Start command — runs the packaged JAR
+    startCommand: java -jar backend/target/smart-resume-analyzer-1.0.0.jar
+
+    # Render Health Check URL
+    healthCheckPath: /api/health
+
+    # Environment Variables
+    envVars:
+      # MongoDB Atlas connection string — set this in Render dashboard
+      - key: MONGODB_URI
+        sync: false           # Set manually in Render dashboard (secret)
+
+      # Server port — Render sets this automatically
+      - key: PORT
+        value: 8080
+
+    # Auto-deploy on git push
+    autoDeploy: true
