@@ -1,0 +1,25 @@
+# ─── Stage 1: Build the JAR using Maven ───────────────────────────
+FROM maven:3.9.6-eclipse-temurin-17 AS build
+
+WORKDIR /app
+
+# Copy pom.xml first (for Docker layer caching)
+COPY backend/pom.xml ./backend/pom.xml
+COPY backend/src ./backend/src
+
+# Build the JAR, skip tests for faster build
+RUN cd backend && mvn clean package -DskipTests
+
+# ─── Stage 2: Run the JAR ─────────────────────────────────────────
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+
+# Copy the built JAR from Stage 1
+COPY --from=build /app/backend/target/smart-resume-analyzer-1.0.0.jar app.jar
+
+# Expose port
+EXPOSE 8080
+
+# Start the app
+ENTRYPOINT ["java", "-jar", "app.jar"]
